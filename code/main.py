@@ -15,6 +15,9 @@ class Game:
         self.clock = pygame.time.Clock()
         self.running = True
         self.load_images()
+        self.frames = [pygame.image.load(join('images', 'enemies', 'bat', f'{i}.png')).convert_alpha() for i in range (4)]
+
+
 
         # groups
         self.all_sprites = AllSprites()
@@ -39,18 +42,12 @@ class Game:
     # mousebutton 1 - left click, 2 - middle, 3 - right, 4 - scroll up, 5 - scroll down
         if pygame.mouse.get_just_pressed()[0] and self.can_shoot:
             pos = self.gun.rect.center + self.gun.player_direction * 50
-            enemy_pos = self.gun.rect.center + self.gun.player_direction * 100
 
             Bullet(self.bullet_surf, pos, self.gun.player_direction, (self.all_sprites, self.bullet_sprites))
             self.can_shoot = False
             self.shoot_time = pygame.time.get_ticks()
             print('Banana')
             
-            Enemy(enemy_pos,(self.all_sprites, self.collision_sprites))
-        # if pygame.mouse.get_just_pressed()[3] and self.can_shoot:
-        #     print('Banana')
-        #     enemy_pos = self.gun.rect.center + (1500, 0)
-        #     Enemy(enemy_pos,(self.all_sprites, self.collision_sprites))
             
     
     def gun_timer(self):
@@ -59,14 +56,7 @@ class Game:
             if current_time - self.shoot_time >= self.gun_cooldown:
                 self.can_shoot = True
     
-    # ENEMY
-    def enemy_spawn(self):
-        Enemy(self.player.rect.center + 200,(self.all_sprites, self.collision_sprites))
-    def enemy_timer(self):
-        print(self.clock)
-        if self.clock_time > 300 and pygame.mouse.get_just_pressed()[3]:
-            Enemy(self.player.rect.center + 200,(self.all_sprites, self.collision_sprites))
-            print('Banana')
+
 
     def setup(self):
         map = load_pygame(join('data', 'maps', 'world.tmx'))
@@ -84,6 +74,10 @@ class Game:
             if obj.name == 'Player':
                 self.player = Player((obj.x, obj.y), self.all_sprites, self.collision_sprites)
                 self.gun = Gun(self.player, self.all_sprites)
+        for obj in map.get_layer_by_name('Entities'):
+            if obj.name == 'Enemy':
+                self.Enemy = Enemy((obj.x, obj.y), self.all_sprites, self.frames)
+        
         
 
 

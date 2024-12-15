@@ -74,46 +74,23 @@ class Bullet(pygame.sprite.Sprite):
             self.kill()
 
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self, pos, groups):
-        self.pos = pos
-        #self.load_images()
-        self.state, self.frame_index = 'bat', 0
-        self.image = pygame.image.load(join('images', 'enemies', 'bat', '0.png')).convert_alpha()
-        self.rect = self.image.get_frect(center = self.pos)
-
+    def __init__(self, pos, groups, frames):
         super().__init__(groups)
+        self.image = pygame.image.load(join('images', 'enemies', 'bat', '0.png')).convert_alpha()
+        self.rect = self.image.get_frect(center = pos)
+        self.frames = frames
+        self.frame_index = 0
 
 
-        self.speed = 1200
-        self.spawn_time = pygame.time.get_ticks()
-        self.lifetime = 500 # 0.5 sec
+    def animate(self,dt):
+        self.frame_index += 5 * dt # sets up the speed of the animaton
+        self.image = self.frames[int(self.frame_index) % 4]
 
-    def load_images(self):
-        self.frames = {'bat':[],'blob':[],'skeleton':[]}
+    def update(self, dt):
+        self.animate(dt)
 
-        for state in self.frames.keys():
-            for folder_path, sub_folders, file_names in walk(join('images', 'enemies', state)):
-                if file_names:
-                    for file_name in sorted(file_names, key = lambda name: int(name.split('.')[0])):
-                        full_path = join(folder_path, file_name)
-                        surf = pygame.image.load(full_path).convert_alpha()
-                        self.frames[state].append(surf)
-    
-    def move(self):
-        pass
-
-
-    # def animate(self, dt):
-    #     # get state
-        
-    #     # animate
-    #     # if the character moves in any direction then play the anymation, else keep the last state and set the frame to 0
-    #     if self.spawn_time - self.lifetime > 0:
-    #         self.frame_index += 5 * dt # sets up the speed of the animaton
-    #         self.image = self.frames[self.state][int(self.frame_index) % len(self.frames[self.state])]
-    #     else:
-    #         self.image = self.frames[self.state][0]
-    
-    # def update(self, dt):
-    #     self.move(dt)
-    #     self.animate(dt)
+# TODO: Make general enemy class
+# TODO: make enemy appear on the map - checked
+# TODO: make enemy animation - checked
+# TODO: make enemy appear on a distance in relationship with the player - checked
+# TODO: move the enemy in the direction of the player, constantly chasing him
