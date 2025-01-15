@@ -3,7 +3,6 @@ from player import Player
 from sprites import *
 from pytmx.util_pygame import load_pygame
 from groups import AllSprites
-
 from random import randint, choice
 
 class Game:
@@ -57,8 +56,7 @@ class Game:
             Bullet(self.bullet_surf, pos, self.gun.player_direction, (self.all_sprites, self.bullet_sprites))
             self.can_shoot = False
             self.shoot_time = pygame.time.get_ticks()
-
-            
+           
     
     def gun_timer(self):
         if not self.can_shoot:
@@ -86,7 +84,18 @@ class Game:
             else:
                 self.spawn_position.append((obj.x, obj.y))
 
+    def bullet_collision(self):
+        if self.bullet_sprites:
+            for bullet in self.bullet_sprites:
+                collision_sprites = pygame.sprite.spritecollide(bullet, self.enemy_sprites, False, pygame.sprite.collide_mask)
+                if collision_sprites:
+                    for sprite in collision_sprites:
+                        sprite.destroy()
+                    bullet.kill()
 
+    def player_collision(self):
+        if pygame.sprite.spritecollide(self.player, self.enemy_sprites, False, pygame.sprite.collide_mask):
+            self.running = False
     def run(self):
         while self.running:
             # dt
@@ -110,6 +119,9 @@ class Game:
             self.gun_timer()
             self.input()
             self.all_sprites.update(dt)
+            self.bullet_collision()
+            self.player_collision()
+
             pygame.display.flip()
 
             
